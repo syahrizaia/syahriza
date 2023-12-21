@@ -2,7 +2,7 @@ const AboutPage = () => {
     return (
         <div className="flex flex-col gap-4 p-4 sm:p-6 h-full">
             <h1 className="text-cyan-500 text-4xl font-semibold">Who am I</h1>
-            <p>My name is <strong>Syahriza Ikhsan Alsistani</strong>. I'm a College Student at University of Bina Sarana Informatika, Cikarang. My major is Information Technology.</p>
+            <p>My name is <strong>Syahriza Ikhsan Alsistani</strong>. Im a College Student at University of Bina Sarana Informatika, Cikarang. My major is Information Technology.</p>
             <>
                 <h2>My skill</h2>
                 <ul>

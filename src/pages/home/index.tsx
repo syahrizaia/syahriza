@@ -4,7 +4,7 @@ const HomePage = () => {
   return (
     <div className='flex flex-col sm:flex-row justify-center items-center gap-20 h-screen'>
       <div className='flex flex-col gap-4'>
-        <p>it's ME not YOU</p>
+        <p>its ME not YOU</p>
         <h1 className='text-cyan-500 text-5xl font-bold'>Syahriza Ikhsan Alsistani</h1>
         <p>Cyber Security | Robotics | AI-ML-DL</p>
       </div>
