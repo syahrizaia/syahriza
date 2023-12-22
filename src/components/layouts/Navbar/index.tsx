@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Navbar = () => {
     return (
-        <div className="bg-cyan-500 flex justify-center items-center gap-4 sm:gap-10 font-semibold">
+        <div className="bg-cyan-500 flex justify-around sm:justify-center items-center gap-0 sm:gap-10 font-semibold">
             <Link
                 className="p-4 hover:bg-black transition duration-300"
                 href={"/home"}
