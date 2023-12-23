@@ -21,6 +21,7 @@ const AboutPage = () => {
             <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis iste officiis sint inventore esse quae. Ipsam sequi natus eius possimus aspernatur alias veniam necessitatibus repudiandae consequuntur atque! Adipisci, eaque mollitia.
             Vel labore ipsum incidunt blanditiis accusamus amet aliquid, id culpa, vitae quod suscipit sint illo quae, ex laboriosam hic impedit in eius alias? Unde asperiores voluptates labore ad? Itaque, molestiae!
             Aspernatur et minus exercitationem fugit magni totam voluptatem quas deserunt laudantium, provident, iusto hic iste molestias atque soluta quidem dicta aliquam recusandae perspiciatis? Ad ex labore nostrum excepturi, in vero.</p>
+            <hr className="border-b-2 border-cyan-500" />
         </div>
     )
 }
