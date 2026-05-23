@@ -11,6 +11,7 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Projects", href: "/projects" },
     { name: "Certificates", href: "/certificates" },
+    { name: "Blogs", href: "/blogs" },
     { name: "About", href: "/about" },
   ];
 
@@ -56,7 +57,7 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-4 right-4 p-6 rounded-3xl bg-slate-900/90 backdrop-blur-2xl border border-white/10 flex flex-col gap-4 md:hidden"
+            className="absolute top-20 right-14 p-6 px-12 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex flex-col justify-center items-center gap-4 md:hidden w-fit"
           >
             {navLinks.map((link) => (
               <Link 

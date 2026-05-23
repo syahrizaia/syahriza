@@ -4,10 +4,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
-import { Trash2, Edit2, X, Briefcase, Award } from "lucide-react";
+import { Trash2, Edit2, X, Briefcase, Award, BookOpen } from "lucide-react";
+import { formatDate } from "@/utils/date";
 
 export default function ManageDataPage() {
-  const [activeTab, setActiveTab] = useState<'projects' | 'certificates'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'certificates' | 'blogs'>('projects');
   const [dataList, setDataList] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
@@ -32,14 +33,16 @@ export default function ManageDataPage() {
         github: formData.github, 
         tech_stack: formData.tech_stack?.split(",").map((t:string) => t.trim()) 
         };
-    } else {
+    } else if (activeTab === 'blogs') {
         payload = { 
-        title: formData.title,
-        issuer: formData.issuer,
-        date: formData.date,
-        link: formData.link,
-        image: formData.image
+            title: formData.title,
+            author: formData.author,
+            excerpt: formData.excerpt,
+            content: formData.content,
+            category: formData.category
         };
+    } else {
+        payload = { title: formData.title, issuer: formData.issuer, date: formData.date, link: formData.link, image: formData.image };
     }
 
     const table = activeTab;
@@ -56,22 +59,6 @@ export default function ManageDataPage() {
     setFormData({ title: "", description: "", link: "", github: "", tech_stack: "", name: "", issuer: "", date: "", image: "" });
     setIsEditing(null);
     fetchData();
-
-    // const table = activeTab;
-    // const idField = activeTab === 'projects' ? 'project_id' : 'cert_id';
-    // const payload = activeTab === 'projects' 
-    //   ? { ...formData, tech_stack: formData.tech_stack?.split(",").map((t:string) => t.trim()) }
-    //   : formData;
-
-    // if (isEditing) {
-    //   await supabase.from(table).update(payload).eq(idField, isEditing);
-    // } else {
-    //   await supabase.from(table).insert([payload]);
-    // }
-
-    // setFormData({});
-    // setIsEditing(null);
-    // fetchData();
   };
 
   const deleteItem = async (id: string) => {
@@ -81,17 +68,31 @@ export default function ManageDataPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
+    <div className="min-h-screen bg-slate-950 p-8 text-white pt-24">
       <div className="max-w-5xl mx-auto">
         {/* Switcher Tab */}
         <div className="flex gap-4 mb-8">
           <button onClick={() => setActiveTab('projects')} className={`flex items-center gap-2 px-6 py-2 rounded-full ${activeTab === 'projects' ? 'bg-cyan-600' : 'bg-slate-800'}`}><Briefcase size={18}/> Projects</button>
           <button onClick={() => setActiveTab('certificates')} className={`flex items-center gap-2 px-6 py-2 rounded-full ${activeTab === 'certificates' ? 'bg-cyan-600' : 'bg-slate-800'}`}><Award size={18}/> Certificates</button>
+          <button onClick={() => setActiveTab('blogs')} className={`flex items-center gap-2 px-6 py-2 rounded-full ${activeTab === 'blogs' ? 'bg-cyan-600' : 'bg-slate-800'}`}><BookOpen size={18}/> Blogs</button>
         </div>
 
         {/* Form Input Dinamis */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-slate-900 p-6 rounded-xl border border-white/10">
-          {activeTab === 'certificates' ? (
+          {activeTab === 'blogs' ? (
+            <>
+              <input placeholder="Title" className="p-2 bg-slate-950 rounded border border-white/10" value={formData.title || ""} onChange={e => setFormData({...formData, title: e.target.value})} />
+              <input 
+                placeholder="Author" 
+                className="p-2 bg-slate-950 rounded border border-white/10" 
+                value={formData.author || ""} 
+                onChange={e => setFormData({...formData, author: e.target.value})} 
+              />
+              <input placeholder="Category" className="p-2 bg-slate-950 rounded border border-white/10" value={formData.category || ""} onChange={e => setFormData({...formData, category: e.target.value})} />
+              <textarea placeholder="Excerpt" className="p-2 bg-slate-950 rounded border border-white/10 md:col-span-2" value={formData.excerpt || ""} onChange={e => setFormData({...formData, excerpt: e.target.value})} />
+              <textarea placeholder="Content" rows={5} className="p-2 bg-slate-950 rounded border border-white/10 md:col-span-2" value={formData.content || ""} onChange={e => setFormData({...formData, content: e.target.value})} />
+            </>
+          ) : activeTab === 'certificates' ? (
             <>
               <input placeholder="Cert Name" className="p-2 bg-slate-950 rounded border border-white/10" value={formData.title || ""} onChange={e => setFormData({...formData, title: e.target.value})} />
               <input placeholder="Issuer" className="p-2 bg-slate-950 rounded border border-white/10" value={formData.issuer || ""} onChange={e => setFormData({...formData, issuer: e.target.value})} />
@@ -148,7 +149,15 @@ export default function ManageDataPage() {
             <table className="w-full text-left min-w-200">
                 <thead className="bg-slate-800 text-sm">
                     <tr>
-                        {activeTab === 'projects' ? (
+                        {activeTab === 'blogs' ? (
+                            <>
+                                <th className="p-4">Title</th>
+                                <th className="p-4">Author</th>
+                                <th className="p-4">Category</th>
+                                <th className="p-4">Excerpt</th>
+                                <th className="p-4">Content</th>
+                            </>
+                        ) : activeTab === 'projects' ? (
                         <>
                             <th className="p-4">Title</th>
                             <th className="p-4">Description</th>
@@ -171,7 +180,18 @@ export default function ManageDataPage() {
                     <tbody>
                     {dataList.map((item, index) => (
                         <tr key={item.project_id || item.cert_id || index} className="border-t border-white/5 hover:bg-white/5">
-                        {activeTab === 'projects' ? (
+                        {activeTab === 'blogs' ? (
+                            <>
+                                <td className="p-4">{item.title}</td>
+                                <td className="p-4">{item.author}</td>
+                                <td className="p-4">{item.category}</td>
+                                <td className="p-4 text-slate-400">{item.excerpt}</td>
+                                <td className="p-4 text-slate-400">{item.content}</td>
+                                <td className="p-4 flex justify-center gap-4">
+                                    {/* Tombol Edit/Delete tetap sama */}
+                                </td>
+                            </>
+                        ) : activeTab === 'projects' ? (
                             <>
                             <td className="p-4">{item.title}</td>
                             <td className="p-4 text-slate-400">{item.description}</td>
@@ -183,7 +203,7 @@ export default function ManageDataPage() {
                             <>
                             <td className="p-4">{item.title}</td>
                             <td className="p-4 text-slate-400">{item.issuer}</td>
-                            <td className="p-4 text-slate-400">{item.date}</td>
+                            <td className="p-4 text-slate-400">{formatDate(item.date)}</td>
                             <td className="p-4 text-slate-400">{item.image}</td>
                             <td className="p-4 text-slate-400">{item.link}</td>
                             </>

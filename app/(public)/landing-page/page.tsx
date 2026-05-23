@@ -26,8 +26,6 @@ export default function LandingPage() {
       if (error) {
         console.error("Error fetching from Supabase:", error);
         return;
-      } else {
-        // console.log("Data:", data);
       }
       
       setProjects((data as Project[]) || []);
@@ -55,6 +53,59 @@ export default function LandingPage() {
       {/* Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
 
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Kilat Layar Global (Screen Flash) */}
+        <motion.div 
+          animate={{ opacity: [0, 0, 0.05, 0, 0, 0.1, 0] }}
+          transition={{ duration: 7, repeat: Infinity, times: [0, 0.5, 0.52, 0.55, 0.85, 0.87, 0.9] }}
+          className="absolute inset-0 bg-cyan-400 mix-blend-overlay"
+        />
+        
+        {/* Listrik Menjalar (Garis Horizontal) */}
+        {[20, 50, 80].map((top, i) => (
+          <motion.div
+            key={`h-${i}`}
+            className="absolute h-[2px] w-full bg-cyan-300 shadow-[0_0_15px_3px_#06b6d4,0_0_30px_5px_#3b82f6]"
+            style={{ top: `${top}%` }}
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ 
+              scaleX: [0, 1, 0], 
+              opacity: [0, 1, 0], 
+              originX: i % 2 === 0 ? [0, 0, 1] : [1, 1, 0] // Bergantian arah dari kiri/kanan
+            }}
+            transition={{ 
+              duration: 1.2, 
+              repeat: Infinity, 
+              delay: (i * 1.5) % 5 + i * 2,
+              ease: "linear", 
+              repeatDelay: (i * 1.2) % 4 + 2
+            }}
+          />
+        ))}
+
+        {/* Listrik Menjalar (Garis Vertikal) */}
+        {[15, 45, 75, 90].map((left, i) => (
+          <motion.div
+            key={`v-${i}`}
+            className="absolute w-[2px] h-full bg-cyan-300 shadow-[0_0_15px_3px_#06b6d4,0_0_30px_5px_#3b82f6]"
+            style={{ left: `${left}%` }}
+            initial={{ scaleY: 0, opacity: 0 }}
+            animate={{ 
+              scaleY: [0, 1, 0], 
+              opacity: [0, 1, 0], 
+              originY: i % 2 === 0 ? [0, 0, 1] : [1, 1, 0] // Bergantian arah atas/bawah
+            }}
+            transition={{ 
+              duration: 1, 
+              repeat: Infinity, 
+              delay: (i * 1.3) % 5 + i * 1.5,
+              ease: "linear", 
+              repeatDelay: (i * 1.5) % 3 + 2
+            }}
+          />
+        ))}
+      </div>
+
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
         <motion.div
@@ -63,9 +114,14 @@ export default function LandingPage() {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <h1 className="text-7xl md:text-9xl font-bold bg-clip-text text-transparent bg-linear-to-b from-white to-cyan-500 mb-6 tracking-tighter">
+          {/* Tambahan efek flicker pada h1 */}
+          <motion.h1 
+            animate={{ opacity: [1, 0.8, 1, 1, 0.5, 1] }}
+            transition={{ duration: 4, repeat: Infinity, times: [0, 0.1, 0.2, 0.8, 0.9, 1] }}
+            className="text-7xl md:text-9xl font-bold bg-clip-text text-transparent bg-linear-to-b from-white to-cyan-500 mb-6 tracking-tighter"
+          >
             FUTURE DEV.
-          </h1>
+          </motion.h1>
 
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
@@ -80,18 +136,16 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row justify-center items-center">
               <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden border border-slate-700 bg-slate-900">
                 <Image
-                  src="/my-photo.png" // Pastikan foto ada di folder 'public'
+                  src="/my-photo.png"
                   alt="Syahriza"
                   fill
                   className="object-cover transform transition-transform duration-500 group-hover:scale-110"
                   priority
-                  sizes="(max-width: 768px) 100vw,
-                  (max-width: 1200px) 50vw,
-                  33vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
               
-              <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 text-center">
+              <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 text-center relative z-10">
                 Membangun pengalaman web digital yang imersif dengan teknologi mutakhir.
               </p>
             </div>
@@ -101,16 +155,16 @@ export default function LandingPage() {
               whileHover={{ y: -5 }}
               className="absolute -bottom-4 -right-4 bg-slate-900 px-4 py-2 rounded-lg border border-cyan-500/50 shadow-xl"
             >
-              <span className="text-cyan-400 font-mono text-sm">Fullstack Dev</span>
+              <span className="text-cyan-400 font-mono text-sm shadow-[0_0_10px_#06b6d4]">Fullstack Dev</span>
             </motion.div>
           </motion.div>
           
-          <div className="flex gap-6 justify-center">
+          <div className="flex gap-6 justify-center relative z-10">
             {[FaGithub, FaLinkedin, FaEnvelope].map((Icon, i) => (
               <motion.button
                 key={i}
-                whileHover={{ scale: 1.2, rotate: 10 }}
-                className="p-4 rounded-full bg-slate-900 border border-slate-700 hover:border-cyan-400 transition-colors"
+                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px #06b6d4" }}
+                className="p-4 rounded-full bg-slate-900 border border-slate-700 hover:border-cyan-400 transition-all duration-300"
               >
                 <Icon size={24} />
               </motion.button>
@@ -123,11 +177,11 @@ export default function LandingPage() {
       <motion.div 
         animate={{ y: [0, -20, 0] }}
         transition={{ repeat: Infinity, duration: 4 }}
-        className="absolute bottom-20 right-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"
+        className="absolute bottom-20 right-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"
       />
 
       {/* Tech Stack Ticker */}
-      <div className="py-10 border-y border-white/5 overflow-hidden">
+      <div className="relative z-10 py-10 border-y border-white/5 overflow-hidden bg-slate-950/50 backdrop-blur-xs">
         <motion.div 
           animate={{ x: ["0%", "-50%"] }}
           transition={{ repeat: Infinity, ease: "linear", duration: 20 }}
@@ -140,7 +194,7 @@ export default function LandingPage() {
       </div>
 
       {/* Stats Section */}
-      <section className="py-20 px-6 max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="relative z-10 py-20 px-6 max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
         {[
           { label: "Projects Done", val: "15+" },
           { label: "Happy Clients", val: "10+" },
@@ -149,26 +203,27 @@ export default function LandingPage() {
         ].map((item, i) => (
           <motion.div 
             key={i}
-            whileHover={{ y: -10 }}
-            className="p-6 rounded-2xl bg-slate-900/50 border border-white/5 text-center"
+            whileHover={{ y: -10, borderColor: "#06b6d4", boxShadow: "0 0 20px rgba(6,182,212,0.2)" }}
+            className="p-6 rounded-2xl bg-slate-900/50 backdrop-blur-md border border-white/5 text-center transition-all duration-300"
           >
-            <h3 className="text-3xl font-bold text-cyan-400">{item.val}</h3>
+            <h3 className="text-3xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">{item.val}</h3>
             <p className="text-slate-500 text-sm mt-2">{item.label}</p>
           </motion.div>
         ))}
       </section>
 
       {/* Featured Projects Preview (Simple) */}
-      <section className="py-20 px-6 max-w-5xl mx-auto">
-        <h2 className="text-3xl font-bold mb-10 text-center">Featured Work</h2>
+      <section className="relative z-10 py-20 px-6 max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold mb-10 text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">Featured Work</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {["KaryaMandiri", "Library Web App"].map((i) => (
-            <div key={i} className="group p-1 rounded-2xl bg-linear-to-br from-slate-800 to-slate-900 border border-white/10 hover:border-cyan-500 transition-all">
-              <div className="h-40 bg-slate-950 rounded-xl mb-4 flex items-center justify-center text-slate-700 font-mono italic">
+            <div key={i} className="group p-1 rounded-2xl bg-linear-to-br from-slate-800 to-slate-900 border border-white/10 hover:border-cyan-500 transition-all duration-500 hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]">
+              <div className="h-40 bg-slate-950 rounded-xl mb-4 flex items-center justify-center text-slate-700 font-mono italic overflow-hidden relative">
+                <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 [Project Preview {i}]
               </div>
-              <div className="p-4">
-                <h4 className="font-bold text-lg mb-2">{i}</h4>
+              <div className="p-4 relative z-10">
+                <h4 className="font-bold text-lg mb-2 group-hover:text-cyan-400 transition-colors">{i}</h4>
                 <p className="text-slate-400 text-sm">KaryaMandiri menghubungkan bisnis dengan ribuan talenta digital lokal untuk menyelesaikan verifikasi data, pelabelan AI, riset pasar, hingga tugas lapangan secara instan dan transparan.</p>
               </div>
             </div>
@@ -176,8 +231,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-20 px-6 max-w-5xl mx-auto">
-        <h2 className="text-3xl font-bold mb-12 text-center">What I Can Do</h2>
+      <section className="relative z-10 py-20 px-6 max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold mb-12 text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">What I Can Do</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { title: "Frontend", desc: "Pixel-perfect interface dengan React & Next.js." },
@@ -186,10 +241,10 @@ export default function LandingPage() {
           ].map((service, i) => (
             <motion.div
               key={i}
-              whileHover={{ scale: 1.05 }}
-              className="p-8 rounded-2xl bg-slate-900 border border-slate-800 hover:border-cyan-500 transition-colors"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(6,182,212,0.15)" }}
+              className="p-8 rounded-2xl bg-slate-900 border border-slate-800 hover:border-cyan-500 transition-all duration-300"
             >
-              <div className="w-12 h-12 bg-cyan-500/10 rounded-lg mb-6 flex items-center justify-center text-cyan-400">
+              <div className="w-12 h-12 bg-cyan-500/10 rounded-lg mb-6 flex items-center justify-center text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">
                 <div className="w-6 h-6 border-2 border-current rounded-full" />
               </div>
               <h3 className="text-xl font-bold mb-3">{service.title}</h3>
@@ -199,24 +254,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-20 px-6 bg-slate-900/30 border-y border-white/5">
+      <section className="relative z-10 py-20 px-6 bg-slate-900/30 border-y border-white/5 backdrop-blur-xs">
         <div className="max-w-3xl mx-auto text-center">
           <motion.blockquote
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            className="text-2xl md:text-3xl font-light italic text-slate-300"
+            className="text-2xl md:text-3xl font-light italic text-slate-300 relative"
           >
-            &quot;Koding adalah seni mengubah logika rumit menjadi pengalaman yang sederhana dan memuaskan bagi pengguna.&quot;
+            <span className="absolute -left-8 -top-8 text-6xl text-cyan-500/20 font-serif">&quot;</span>
+            Koding adalah seni mengubah logika rumit menjadi pengalaman yang sederhana dan memuaskan bagi pengguna.
+            <span className="absolute -right-8 -bottom-8 text-6xl text-cyan-500/20 font-serif">&quot;</span>
           </motion.blockquote>
           <div className="mt-8 flex items-center justify-center gap-4">
-            <div className="w-12 h-0.5 bg-cyan-500" />
-            <span className="text-cyan-400 font-mono tracking-widest uppercase text-sm">Syahriza</span>
+            <div className="w-12 h-0.5 bg-cyan-500 drop-shadow-[0_0_5px_#06b6d4]" />
+            <span className="text-cyan-400 font-mono tracking-widest uppercase text-sm drop-shadow-[0_0_5px_#06b6d4]">Syahriza</span>
           </div>
         </div>
       </section>
 
-      {/* Dekorasir Background */}
-      <div className="fixed inset-0 pointer-events-none">
+      {/* Dekorasir Background Blurs */}
+      <div className="fixed inset-0 pointer-events-none z-0">
         <motion.div 
           animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
           transition={{ repeat: Infinity, duration: 15 }}

@@ -5,6 +5,7 @@ import { Award, ExternalLink, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatDate } from "@/utils/date";
 
 interface Certificate {
   cert_id: string;
@@ -74,7 +75,7 @@ export default function CertificatesPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-slate-500 text-xs">
                     <Calendar size={14} />
-                    {cert.date}
+                    {formatDate(cert.date)}
                   </div>
                   <Link
                     href={cert.link} 

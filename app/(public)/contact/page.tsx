@@ -7,11 +7,25 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 export default function ContactPage() {
   const [status, setStatus] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("sending");
-    // Simulasi pengiriman
-    setTimeout(() => setStatus("success"), 1500);
+
+    const formData = new FormData(e.currentTarget);
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setStatus("success");
+      (e.target as HTMLFormElement).reset(); // Reset form setelah sukses
+      setTimeout(() => setStatus(""), 5000); // Reset status setelah 5 detik
+    } else {
+      setStatus("error");
+    }
   };
 
   return (
@@ -51,17 +65,25 @@ export default function ContactPage() {
             onSubmit={handleSubmit}
             className="p-8 rounded-3xl bg-slate-900/50 backdrop-blur-md border border-white/10 space-y-4"
           >
+            <input type="hidden" name="access_key" value="6daf3882-513b-44d3-a267-52d39b0a681d" />
+            
             <input 
+              name="name"
+              required
               type="text" 
               placeholder="Nama Anda" 
               className="w-full p-4 rounded-xl bg-slate-950 border border-white/5 focus:border-cyan-500 outline-none transition-all"
             />
             <input 
+              name="email"
+              required
               type="email" 
               placeholder="Email Anda" 
               className="w-full p-4 rounded-xl bg-slate-950 border border-white/5 focus:border-cyan-500 outline-none transition-all"
             />
             <textarea 
+              name="message"
+              required
               rows={4}
               placeholder="Pesan Anda" 
               className="w-full p-4 rounded-xl bg-slate-950 border border-white/5 focus:border-cyan-500 outline-none transition-all"
@@ -69,11 +91,12 @@ export default function ContactPage() {
             <button 
               type="submit"
               disabled={status === "sending"}
-              className="w-full py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 font-bold flex items-center justify-center gap-2 transition-all"
+              className="w-full py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               {status === "sending" ? "Mengirim..." : (status === "success" ? "Terkirim!" : "Kirim Pesan")}
               <Send size={18} />
             </button>
+            {status === "error" && <p className="text-red-400 text-center text-sm">Gagal mengirim pesan. Coba lagi.</p>}
           </motion.form>
         </div>
       </div>
