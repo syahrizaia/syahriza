@@ -39,7 +39,7 @@ export default function RootLayout({
           {children}
         </main>
 
-        <AudioPlayer />
+        {/* <AudioPlayer /> */}
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 
 interface Project {

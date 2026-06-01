@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { formatDate } from "@/utils/date";
-import { supabase } from "@/utils/supabase";
+import { formatDate } from "@/lib/date";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import Link from "next/link";

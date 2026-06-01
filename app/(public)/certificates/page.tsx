@@ -1,11 +1,11 @@
 "use client";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import { Award, ExternalLink, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatDate } from "@/utils/date";
+import { formatDate } from "@/lib/date";
 
 interface Certificate {
   cert_id: string;

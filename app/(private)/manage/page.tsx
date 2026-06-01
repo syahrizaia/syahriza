@@ -3,9 +3,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/lib/supabase";
 import { Trash2, Edit2, X, Briefcase, Award, BookOpen } from "lucide-react";
-import { formatDate } from "@/utils/date";
+import { formatDate } from "@/lib/date";
 
 export default function ManageDataPage() {
   const [activeTab, setActiveTab] = useState<'projects' | 'certificates' | 'blogs'>('projects');
