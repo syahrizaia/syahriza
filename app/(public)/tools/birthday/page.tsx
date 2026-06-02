@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -17,7 +17,9 @@ import {
   User,
   Copy,
   Check,
-  Sparkles
+  Sparkles,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 
 // Generator Partikel Konfeti yang Lebih Ramai & Bervariasi
@@ -55,6 +57,9 @@ function BirthdayContent() {
   const [generatedLink, setGeneratedLink] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+
   // Deteksi otomatis jika ada nama di URL (?name=Yunita)
   useEffect(() => {
     if (nameParam) {
@@ -69,6 +74,47 @@ function BirthdayContent() {
       setConfettiParticles(generateConfetti(65));
     }
   }, [isCelebrating]);
+
+  useEffect(() => {
+    const playAudio = () => {
+      if (isCelebrating && audioRef.current) {
+        audioRef.current.play().catch(() => {
+          console.log("Autoplay diblokir browser, musik akan menyala setelah klik pertama pengguna.");
+        });
+      }
+    };
+
+    // Coba langsung putar musik
+    playAudio();
+
+    // Fallback: Jika diblokir, pasang listener klik pertama di window
+    const handleFirstUserInteraction = () => {
+      if (isCelebrating && audioRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
+      }
+      // Hapus listener setelah interaksi pertama berhasil didapatkan
+      window.removeEventListener("click", handleFirstUserInteraction);
+      window.removeEventListener("touchstart", handleFirstUserInteraction);
+    };
+
+    if (isCelebrating) {
+      window.addEventListener("click", handleFirstUserInteraction);
+      window.addEventListener("touchstart", handleFirstUserInteraction);
+    }
+
+    return () => {
+      window.removeEventListener("click", handleFirstUserInteraction);
+      window.removeEventListener("touchstart", handleFirstUserInteraction);
+    };
+  }, [isCelebrating]);
+
+  // Handler fungsi mute/unmute manual
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
 
   const birthdayWishes = [
     // --- BAHASA INDONESIA ---
@@ -117,6 +163,31 @@ function BirthdayContent() {
 
   return (
     <div className="min-h-screen bg-slate-950 py-20 px-6 text-white flex flex-col items-center justify-center relative overflow-hidden">
+
+      {/* ELEMENT AUDIO (Sembunyi secara visual) */}
+      <audio
+        ref={audioRef}
+        src="/birthday-song.mp3" 
+        loop
+        preload="auto"
+      />
+
+      {/* TOMBOL MUTE MENGAMBANG (Hanya muncul di fase penerima) */}
+      {isCelebrating && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={toggleMute}
+          className="fixed top-6 right-6 z-50 p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 backdrop-blur-md text-white hover:text-pink-400 hover:border-pink-500/40 shadow-xl cursor-pointer transition-all flex items-center justify-center"
+          title={isMuted ? "Nyalakan Musik" : "Matikan Musik"}
+        >
+          {isMuted ? (
+            <VolumeX size={20} className="text-rose-500 animate-pulse" />
+          ) : (
+            <Volume2 size={20} className="text-emerald-400 animate-bounce" />
+          )}
+        </motion.button>
+      )}
       
       {/* BACKGROUND AMBIENT GLOW MULTI-WARNA */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">

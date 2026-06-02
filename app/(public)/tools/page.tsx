@@ -41,9 +41,25 @@ const toolsData = [
     desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan Idul Adha dengan animasi dan efek visual yang meriah, cocok untuk merayakan momen spesial.",
     link: "eid-aladha"
   },
+  {
+    id: 5,
+    name: "Kotak Pesan Anonim (Custom Secreto / NGL Clone)",
+    category: "Kotak Pesan",
+    status: "Fun Project",
+    desc: "Kirim pesan rahasia atau periksa kotak masukmu hanya menggunakan nomor telepon tujuan tanpa sebar link WhatsApp. Orang lain bisa membuka pesan itu untuk menerima pesan jujur atau pengakuan tanpa nama secara anonim.",
+    link: "secret-box"
+  },
+  {
+    id: 6,
+    name: "Wrapped Versi Pertemanan atau Pasangan",
+    category: "Wrapped",
+    status: "Fun Project",
+    desc: "Terinspirasi dari Spotify Wrapped, kamu bisa bikin rangkuman kilas balik perjalanan hubungan atau pertemanan dalam bentuk slideshow interaktif mirip Instagram Stories.",
+    link: "wrapped"
+  }
 ];
 
-const categories = ["Semua", "Kartu Ucapan"];
+const categories = ["Semua", "Kartu Ucapan", "Kotak Pesan", "Wrapped"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,7 +71,8 @@ export default function ToolsPage() {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           tool.desc.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
-  });
+  })
+  .sort((a, b) => b.id - a.id);
 
   return (
     <div className="min-h-screen bg-slate-950 py-24 px-6 text-white">

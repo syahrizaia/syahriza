@@ -20,7 +20,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     async function fetchProjects() {
-      const { data } = await supabase.from('projects').select('*');
+      const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
       setProjects(data || []);
     }
     fetchProjects();

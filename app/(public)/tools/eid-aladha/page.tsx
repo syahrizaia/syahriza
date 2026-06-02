@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -16,6 +16,8 @@ import {
   Flame, 
   Smile,
   Heart,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 
 // Generator Partikel Bara Api Keikhlasan (Floating Embers)
@@ -46,7 +48,12 @@ function EidAdhaContent() {
   const [generatedLink, setGeneratedLink] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
-  // 1. Deteksi otomatis param URL (?name=Syahriza)
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const [hijriYear, setHijriYear] = useState("1447");
+
+  // Deteksi otomatis param URL (?name=Syahriza)
   useEffect(() => {
     if (nameParam) {
       setTargetName(nameParam);
@@ -54,16 +61,66 @@ function EidAdhaContent() {
     }
   }, [nameParam]);
 
-  // 2. Siapkan efek bara mengambang jika perayaan aktif
+  // Siapkan efek bara mengambang jika perayaan aktif
   useEffect(() => {
     if (isCelebrating) {
       setEmberParticles(generateEmbers(35));
     }
   }, [isCelebrating]);
 
+  useEffect(() => {
+    const playAudio = () => {
+      if (isCelebrating && audioRef.current) {
+        audioRef.current.play().catch(() => {
+          console.log("Autoplay diblokir browser, musik akan aktif setelah ketukan pertama.");
+        });
+      }
+    };
+
+    playAudio();
+
+    const handleFirstTap = () => {
+      if (isCelebrating && audioRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
+      }
+      // Bersihkan listener setelah interaksi pertama terjadi
+      window.removeEventListener("click", handleFirstTap);
+      window.removeEventListener("touchstart", handleFirstTap);
+    };
+
+    if (isCelebrating) {
+      window.addEventListener("click", handleFirstTap);
+      window.addEventListener("touchstart", handleFirstTap);
+    }
+
+    return () => {
+      window.removeEventListener("click", handleFirstTap);
+      window.removeEventListener("touchstart", handleFirstTap);
+    };
+  }, [isCelebrating]);
+
+  // Fungsi Toggle Mute Manual
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  useEffect(() => {
+    // Mengambil tahun Hijriah secara otomatis berdasarkan tanggal saat ini
+    const formattedYear = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { year: 'numeric' })
+      .formatToParts(new Date())
+      .find(part => part.type === 'year')?.value;
+
+    if (formattedYear) {
+      setHijriYear(formattedYear);
+    }
+  }, []);
+
   const adhaWishes = [
     // --- BAHASA INDONESIA (4) ---
-    `Selamat Hari Raya Idul Adha 1447 H, ${targetName}! Semoga semangat pengorbanan Nabi Ibrahim AS menginspirasi kita untuk terus membersihkan hati, berbagi kebahagiaan, dan memperkuat keikhlasan di setiap baris perjalanan hidup kita. 🕋🐑`,
+    `Selamat Hari Raya Idul Adha ${hijriYear} H, ${targetName}! Semoga semangat pengorbanan Nabi Ibrahim AS menginspirasi kita untuk terus membersihkan hati, berbagi kebahagiaan, dan memperkuat keikhlasan di setiap baris perjalanan hidup kita. 🕋🐑`,
     `Selamat Lebaran Haji, ${targetName}! Di hari yang penuh berkah ini, semoga sate dan gulai qurbanmu melimpah, begitu pula dengan aliran pahala, kesehatan, serta kebahagiaan untukmu dan keluarga. 🥩✨`,
     `Kurban lebih dari sekadar berbagi daging; ia adalah simbol ketulusan menyerahkan yang terbaik. Selamat Idul Adha, ${targetName}! Semoga Allah menerima seluruh amal ibadah dan kurban kita tahun ini. 🤲💚`,
     `Selamat Hari Raya Idul Adha, ${targetName}! Semoga kehangatan momen kumpul keluarga, gema takbir yang mengangkasa, dan berkah ampunan senantiasa menyelimuti harimu. Merdeka dalam berbagi! 🌾🌟`,
@@ -108,6 +165,31 @@ function EidAdhaContent() {
 
   return (
     <div className="min-h-screen bg-slate-950 py-20 px-6 text-white flex flex-col items-center justify-center relative overflow-hidden">
+
+      {/* ELEMEN AUDIO TERSEMBUNYI */}
+      <audio
+        ref={audioRef}
+        src="/eid-song.mp3" 
+        loop
+        preload="auto"
+      />
+
+      {/* TOMBOL MUTE ELEGAN MENGAMBANG */}
+      {isCelebrating && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={toggleMute}
+          className="fixed top-6 right-6 z-50 p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 backdrop-blur-md text-white hover:text-rose-400 hover:border-rose-500/40 shadow-xl cursor-pointer transition-all flex items-center justify-center"
+          title={isMuted ? "Putar Musik" : "Senapkan Musik"}
+        >
+          {isMuted ? (
+            <VolumeX size={20} className="text-rose-500 animate-pulse" />
+          ) : (
+            <Volume2 size={20} className="text-pink-400 animate-bounce" />
+          )}
+        </motion.button>
+      )}
       
       {/* BACKGROUND AMBIENT GLOW */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -235,7 +317,7 @@ function EidAdhaContent() {
                   animate={{ scale: 1 }}
                   className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-mono tracking-wider uppercase"
                 >
-                  <Moon size={12} className="animate-pulse text-amber-400" /> 10 Dzulhijjah 1447 H
+                  <Moon size={12} className="animate-pulse text-amber-400" /> 10 Dzulhijjah {hijriYear} H
                 </motion.div>
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-white via-emerald-300 to-orange-400">
                   Selamat Idul Adha, <br />

@@ -14,7 +14,7 @@ export default function ManageDataPage() {
   const [formData, setFormData] = useState<any>({});
 
   const fetchData = async () => {
-    const { data } = await supabase.from(activeTab).select('*');
+    const { data } = await supabase.from(activeTab).select('*').order('created_at', { ascending: false });
     setDataList(data || []);
   };
 

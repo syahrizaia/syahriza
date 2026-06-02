@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -15,7 +15,9 @@ import {
   Check, 
   Compass, 
   Smile,
-  Heart
+  Heart,
+  VolumeX,
+  Volume2
 } from "lucide-react";
 
 // Generator Partikel Bintang Malam Syawal
@@ -46,6 +48,11 @@ function EidContent() {
   const [generatedLink, setGeneratedLink] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const [hijriYear, setHijriYear] = useState("1447");
+
   // Deteksi otomatis param URL (?name=Syahriza)
   useEffect(() => {
     if (nameParam) {
@@ -61,9 +68,59 @@ function EidContent() {
     }
   }, [isCelebrating]);
 
+  useEffect(() => {
+    const playAudio = () => {
+      if (isCelebrating && audioRef.current) {
+        audioRef.current.play().catch(() => {
+          console.log("Autoplay diblokir browser, musik akan aktif setelah ketukan pertama.");
+        });
+      }
+    };
+
+    playAudio();
+
+    const handleFirstTap = () => {
+      if (isCelebrating && audioRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
+      }
+      // Bersihkan listener setelah interaksi pertama terjadi
+      window.removeEventListener("click", handleFirstTap);
+      window.removeEventListener("touchstart", handleFirstTap);
+    };
+
+    if (isCelebrating) {
+      window.addEventListener("click", handleFirstTap);
+      window.addEventListener("touchstart", handleFirstTap);
+    }
+
+    return () => {
+      window.removeEventListener("click", handleFirstTap);
+      window.removeEventListener("touchstart", handleFirstTap);
+    };
+  }, [isCelebrating]);
+
+  // Fungsi Toggle Mute Manual
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  useEffect(() => {
+    // Mengambil tahun Hijriah secara otomatis berdasarkan tanggal saat ini
+    const formattedYear = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { year: 'numeric' })
+      .formatToParts(new Date())
+      .find(part => part.type === 'year')?.value;
+
+    if (formattedYear) {
+      setHijriYear(formattedYear);
+    }
+  }, []);
+
   const eidWishes = [
     // --- BAHASA INDONESIA (4) ---
-    `Selamat Hari Raya Idul Fitri 1447 H, ${targetName}! Di hari yang suci ini, semoga segala 'error' di masa lalu dihapus, dan hidup kita kembali di-deploy bersih dengan penuh berkah. Mohon maaf lahir & batin! 💻🌙`,
+    `Selamat Hari Raya Idul Fitri ${hijriYear} H, ${targetName}! Di hari yang suci ini, semoga segala 'error' di masa lalu dihapus, dan hidup kita kembali di-deploy bersih dengan penuh berkah. Mohon maaf lahir & batin! 💻🌙`,
     `Taqabbalallahu minna wa minkum. Selamat Lebaran, ${targetName}! Semoga kebahagiaan, kedamaian hati, dan kelimpahan rezeki selalu menyertai langkahmu serta keluarga besar. 🤲✨`,
     `Matahari Syawal telah terbit membawa kesucian. Selamat Idul Fitri, ${targetName}! Mari bersihkan hati, ulurkan tangan, dan rajut kembali tali silaturahmi dengan keikhlasan yang tulus. 💚🎉`,
     `Selamat Hari Raya Idul Fitri, ${targetName}! Terima kasih sudah selalu menjadi sosok yang menginspirasi. Selamat berkumpul, menikmati ketupat, dan merayakan kemenangan ini! 🍲⭐`,
@@ -108,6 +165,31 @@ function EidContent() {
 
   return (
     <div className="min-h-screen bg-slate-950 py-20 px-6 text-white flex flex-col items-center justify-center relative overflow-hidden">
+
+      {/* ELEMEN AUDIO TERSEMBUNYI */}
+      <audio
+        ref={audioRef}
+        src="/eid-song.mp3" 
+        loop
+        preload="auto"
+      />
+
+      {/* TOMBOL MUTE ELEGAN MENGAMBANG */}
+      {isCelebrating && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={toggleMute}
+          className="fixed top-6 right-6 z-50 p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 backdrop-blur-md text-white hover:text-rose-400 hover:border-rose-500/40 shadow-xl cursor-pointer transition-all flex items-center justify-center"
+          title={isMuted ? "Putar Musik" : "Senapkan Musik"}
+        >
+          {isMuted ? (
+            <VolumeX size={20} className="text-rose-500 animate-pulse" />
+          ) : (
+            <Volume2 size={20} className="text-pink-400 animate-bounce" />
+          )}
+        </motion.button>
+      )}
       
       {/* BACKGROUND AMBIENT GLOW */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -234,7 +316,7 @@ function EidContent() {
                   animate={{ scale: 1 }}
                   className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono tracking-wider uppercase"
                 >
-                  <Moon size={12} className="animate-pulse text-amber-400" /> 1 Syawal 1447 H
+                  <Moon size={12} className="animate-pulse text-amber-400" /> 1 Syawal {hijriYear} H
                 </motion.div>
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-white via-emerald-300 to-amber-300">
                   Selamat Idul Fitri, <br />
