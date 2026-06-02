@@ -3,14 +3,36 @@
 import { useState, useEffect, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function AudioPlayer() {
+  const pathname = usePathname();
   const [isPlaying, setIsPlaying] = useState(false);
   const [showOverlay, setShowOverlay] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // LOGIKA UTAMA: Mengatur otomatisasi putar/jeda antar halaman
   useEffect(() => {
-    // Siapkan audio, tapi JANGAN di-play dulu
+    if (!audioRef.current) return;
+
+    if (pathname.startsWith("/tools") || pathname === "/tools") {
+      // Jika masuk ke /tools, paksa jeda lagunya
+      audioRef.current.pause();
+    } else {
+      // Jika keluar dari /tools ke halaman lain, putar kembali HANYA JIKA:
+      // - User memang ingin menyalakan lagu (isPlaying)
+      // - User sudah melewati gerbang WELCOME (!showOverlay)
+      // - Lagunya saat ini memang sedang terjeda (audioRef.current.paused)
+      if (isPlaying && !showOverlay && audioRef.current.paused) {
+        audioRef.current.play().catch((err) => {
+          console.error("Gagal memutar ulang audio otomatis:", err);
+        });
+      }
+    }
+  }, [pathname, isPlaying, showOverlay]); // Tambahkan dependency agar sinkron
+
+  // Inisialisasi Audio saat pertama kali web dimuat
+  useEffect(() => {
     audioRef.current = new Audio("/bg-music.mp3");
     audioRef.current.loop = true;
     audioRef.current.volume = 1;
@@ -32,7 +54,6 @@ export default function AudioPlayer() {
         console.error("Autoplay diblokir:", err);
       });
     }
-    // Hilangkan layar awal
     setShowOverlay(false);
   };
 
@@ -47,6 +68,11 @@ export default function AudioPlayer() {
       setIsPlaying(!isPlaying);
     }
   };
+
+  // Komponen disembunyikan secara visual di halaman /tools, namun state-nya tetap terjaga
+  if (pathname.startsWith("/tools")) {
+    return null;
+  }
 
   return (
     <>
@@ -73,7 +99,7 @@ export default function AudioPlayer() {
               
               <button
                 onClick={startExperience}
-                className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-cyan-500 text-white font-bold tracking-widest transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:-translate-y-1"
+                className="px-8 py-3 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-cyan-500 text-white font-bold tracking-widest transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.6)] hover:-translate-y-1 cursor-pointer"
               >
                 ENTER SITE
               </button>
@@ -88,7 +114,7 @@ export default function AudioPlayer() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 1, type: "spring" }}
           onClick={togglePlay}
-          className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] transition-all duration-300"
+          className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] transition-all duration-300 cursor-pointer"
           aria-label="Toggle Background Music"
         >
           {isPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}

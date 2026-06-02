@@ -11,55 +11,39 @@ import { useState } from "react";
 const toolsData = [
   {
     id: 1,
-    name: "Ucapan Selamat Ulang Tahun",
-    category: "Software",
-    status: "Daily Driver",
+    name: "Generator Ucapan Selamat Ulang Tahun",
+    category: "Kartu Ucapan",
+    status: "Fun Project",
     desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan ulang tahun dengan animasi dan efek visual yang meriah, cocok untuk merayakan momen spesial.",
     link: "birthday"
   },
   {
     id: 2,
-    name: "MacBook Air M-Series",
-    category: "Hardware",
-    status: "Main Machine",
-    desc: "Perangkat utama untuk kompilasi kode, manajemen repositori, dan pengerjaan proyek secara portabel.",
-    link: "macbook-air-m-series"
+    name: "Generator Ucapan Hari Valentine",
+    category: "Kartu Ucapan",
+    status: "Fun Project",
+    desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan hari valentine dengan animasi dan efek visual yang romantis, cocok untuk merayakan momen spesial.",
+    link: "valentine"
   },
   {
     id: 3,
-    name: "Claude 3.5 Sonnet",
-    category: "AI Tools",
-    status: "Copilot",
-    desc: "Asisten kecerdasan buatan andalan untuk rekonstruksi logika algoritma kompleks dan arsitektur sistem.",
-    link: "claude-3.5-sonnet"
+    name: "Generator Ucapan Selamat Idul Fitri",
+    category: "Kartu Ucapan",
+    status: "Fun Project",
+    desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan Idul Fitri dengan animasi dan efek visual yang meriah, cocok untuk merayakan momen spesial.",
+    link: "eid-alfitr"
   },
   {
     id: 4,
-    name: "Warp Terminal",
-    category: "Software",
-    status: "Daily Driver",
-    desc: "Terminal berbasis AI modern dengan eksekusi perintah super cepat dan manajemen alur kerja yang rapi.",
-    link: "warp-terminal"
+    name: "Generator Ucapan Selamat Idul Adha",
+    category: "Kartu Ucapan",
+    status: "Fun Project",
+    desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan Idul Adha dengan animasi dan efek visual yang meriah, cocok untuk merayakan momen spesial.",
+    link: "eid-aladha"
   },
-  {
-    id: 5,
-    name: "Figma",
-    category: "Software",
-    status: "UI/UX Design",
-    desc: "Kanvas digital untuk merancang cetak biru antarmuka, wireframing, hingga pembuatan aset visual harian.",
-    link: "figma"
-  },
-  {
-    id: 6,
-    name: "Git / GitHub",
-    category: "Utilities",
-    status: "Version Control",
-    desc: "Infrastruktur wajib untuk melacak perubahan kode, kolaborasi, dan otomatisasi deployment sistem.",
-    link: "git-github"
-  }
 ];
 
-const categories = ["Semua", "Software", "Hardware", "AI Tools", "Utilities"];
+const categories = ["Semua", "Kartu Ucapan"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,10 +68,10 @@ export default function ToolsPage() {
           className="mb-16 text-center"
         >
           <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-white to-cyan-500">
-            Perkakas Kerja
+            Katalog Alat
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Daftar perangkat keras, aplikasi, dan sistem kecerdasan buatan yang mendukung produktivitas harian saya.
+            Temukan berbagai alat dan aplikasi yang dapat membantu Anda dalam kegiatan sehari-hari.
           </p>
         </motion.div>
 
