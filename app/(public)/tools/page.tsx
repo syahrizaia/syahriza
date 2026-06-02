@@ -56,6 +56,14 @@ const toolsData = [
     status: "Fun Project",
     desc: "Terinspirasi dari Spotify Wrapped, kamu bisa bikin rangkuman kilas balik perjalanan hubungan atau pertemanan dalam bentuk slideshow interaktif mirip Instagram Stories.",
     link: "wrapped"
+  },
+  {
+    id: 7,
+    name: "Generator Ucapan Wisuda",
+    category: "Kartu Ucapan",
+    status: "Fun Project",
+    desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan wisuda dengan animasi dan efek visual yang meriah, cocok untuk merayakan momen spesial.",
+    link: "graduation"
   }
 ];
 

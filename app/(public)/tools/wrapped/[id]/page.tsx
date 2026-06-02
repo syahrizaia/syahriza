@@ -215,7 +215,7 @@ export default function WrappedViewer({ params }: { params: Promise<{ id: string
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-0 md:p-6 lg:p-24 relative">
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center pt-20 md:p-6 lg:p-24 relative">
       <audio 
         ref={audioRef} 
         loop 
