@@ -13,6 +13,7 @@ export default function Navbar() {
     { name: "Certificates", href: "/certificates" },
     { name: "Blogs", href: "/blogs" },
     { name: "Tools", href: "/tools" },
+    { name: "Games", href: "/games" },
     { name: "About", href: "/about" },
   ];
 
