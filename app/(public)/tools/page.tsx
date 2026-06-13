@@ -64,6 +64,22 @@ const toolsData = [
     status: "Fun Project",
     desc: "Sebuah aplikasi web interaktif yang menyajikan ucapan wisuda dengan animasi dan efek visual yang meriah, cocok untuk merayakan momen spesial.",
     link: "graduation"
+  },
+  {
+    id: 8,
+    name: "Generator Kode QR Instan",
+    category: "Utilitas",
+    status: "Fun Project",
+    desc: "Ubah tautan, teks, atau nomor telepon menjadi kode QR secara real-time dengan kustomisasi warna fore/background, pengaturan resolusi ukuran, serta fitur unduh gambar PNG langsung.",
+    link: "qr-generator"
+  },
+  {
+    id: 9,
+    name: "Pemeriksa Lokasi Kartu & Validasi Operator (Premium HLR Lookup)",
+    category: "Utilitas",
+    status: "Premium Project",
+    desc: "Lacak kota registrasi, status aktif, dan provider nomor HP dari seluruh operator Indonesia menggunakan sistem HLR Lookup. Dilengkapi panduan taktis pemulihan perangkat hilang. [Terintegrasi Payment Gateway Resmi]",
+    link: "phone-tracker"
   }
 ];
 

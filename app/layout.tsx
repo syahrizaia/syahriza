@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import AudioPlayer from "@/components/audio-player";
+import GlobalGiftWidget from "@/components/GlobalGiftWidget";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +39,9 @@ export default function RootLayout({
 
         <main className="grow">
           {children}
+
+          <Toaster position="top-center" reverseOrder={false} />
+          <GlobalGiftWidget />
         </main>
 
         <AudioPlayer />

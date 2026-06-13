@@ -114,7 +114,7 @@ export default function AudioPlayer() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 1, type: "spring" }}
           onClick={togglePlay}
-          className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] transition-all duration-300 cursor-pointer"
+          className="fixed bottom-6 left-6 z-50 p-3 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] transition-all duration-300 cursor-pointer"
           aria-label="Toggle Background Music"
         >
           {isPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}
