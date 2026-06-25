@@ -80,10 +80,18 @@ const toolsData = [
     status: "Premium Project",
     desc: "Lacak kota registrasi, status aktif, dan provider nomor HP dari seluruh operator Indonesia menggunakan sistem HLR Lookup. Dilengkapi panduan taktis pemulihan perangkat hilang. [Terintegrasi Payment Gateway Resmi]",
     link: "phone-tracker"
+  },
+  {
+    id: 10,
+    name: "Ruang Pelepasan & Awan Emosi (Venting Wall)",
+    category: "Utilitas",
+    status: "Fun Project",
+    desc: "Wadah anonim untuk meluapkan beban pikiran. Kalimat atau keluhan yang baru dimasukkan atau sering ditekankan akan membesar secara dinamis membentuk visualisasi awan emosi kolektif.",
+    link: "vent"
   }
 ];
 
-const categories = ["Semua", "Kartu Ucapan", "Kotak Pesan", "Wrapped"];
+const categories = ["Semua", "Kartu Ucapan", "Kotak Pesan", "Wrapped", "Utilitas"];
 
 export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState("");
