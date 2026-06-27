@@ -16,15 +16,36 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+// FUNGSI PENYELARAS FORMAT NOMOR TELEPON (STANDAR INDONESIA WA: 628xxx)
+const normalizePhoneNumber = (phone: string): string => {
+  // Hapus semua karakter non-angka seperti Spasi, Strip (-), dan Plus (+)
+  let cleaned = phone.replace(/\D/g, "");
+  
+  // Jika pengguna tidak sengaja mengetik "+620812...", setelah di-strip jadi "620812..."
+  if (cleaned.startsWith("6208")) {
+    cleaned = "628" + cleaned.slice(4);
+  }
+  // Jika diawali format lokal "0812...", ubah menjadi "62812..."
+  else if (cleaned.startsWith("08")) {
+    cleaned = "62" + cleaned.slice(1);
+  }
+  // Jika diawali langsung angka "812..." (tanpa 0/62), tambahkan "62" di depannya
+  else if (cleaned.startsWith("8")) {
+    cleaned = "62" + cleaned;
+  }
+  
+  return cleaned;
+};
+
 export default function SecretBoxPage() {
   const [activeTab, setActiveTab] = useState<"send" | "inbox">("send");
   
   // State Form Pengirim
   const [senderName, setSenderName] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
-  const [messageText, setMessageText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
+  const [messageText, setMessageText] = useState("");
 
   // State Form Penerima
   const [myPhone, setMyPhone] = useState("");
@@ -45,11 +66,19 @@ export default function SecretBoxPage() {
     e.preventDefault();
     if (!recipientPhone.trim() || !messageText.trim()) return;
 
+    // Normalisasikan nomor penerima sebelum masuk ke database
+    const sanitizedRecipient = normalizePhoneNumber(recipientPhone);
+
+    if (sanitizedRecipient.length < 9) {
+      alert("Format nomor telepon tujuan tidak valid.");
+      return;
+    }
+
     setIsSending(true);
     const { error } = await supabase.from("anonymous_messages").insert([
       {
         sender_name: senderName.trim() || "Anonim",
-        recipient_phone: recipientPhone.trim(),
+        recipient_phone: sanitizedRecipient, // Simpan nomor bersih
         message: messageText.trim(),
       },
     ]);
@@ -70,13 +99,21 @@ export default function SecretBoxPage() {
     e.preventDefault();
     if (!myPhone.trim()) return;
 
+    // Normalisasikan nomor pencari agar cocok dengan data bersih di DB
+    const sanitizedMyPhone = normalizePhoneNumber(myPhone);
+
+    if (sanitizedMyPhone.length < 9) {
+      alert("Format nomor telepon Anda tidak valid.");
+      return;
+    }
+
     setIsLoadingInbox(true);
     setHasCheckedInbox(true);
 
     const { data, error } = await supabase
       .from("anonymous_messages")
       .select("*")
-      .eq("recipient_phone", myPhone.trim())
+      .eq("recipient_phone", sanitizedMyPhone) // Cari menggunakan nomor bersih
       .order("created_at", { ascending: false });
 
     setIsLoadingInbox(false);
@@ -173,7 +210,7 @@ export default function SecretBoxPage() {
                       required
                       value={recipientPhone}
                       onChange={(e) => setRecipientPhone(e.target.value)}
-                      placeholder="Contoh: 08123456789"
+                      placeholder="Contoh: 08123456789 atau +62 821..."
                       className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-white/5 rounded-xl text-sm focus:outline-none focus:border-violet-500 transition-colors placeholder-slate-600"
                     />
                   </div>
@@ -242,7 +279,7 @@ export default function SecretBoxPage() {
                         required
                         value={myPhone}
                         onChange={(e) => setMyPhone(e.target.value)}
-                        placeholder="Masukkan nomor untuk cek pesan"
+                        placeholder="Contoh: 08123456789 atau +62 821..."
                         className="w-full pl-11 pr-4 py-3 bg-slate-950/60 border border-white/5 rounded-xl text-sm focus:outline-none focus:border-fuchsia-500 transition-colors placeholder-slate-600"
                       />
                     </div>

@@ -6,9 +6,9 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import TabSwitcher from "@/components/TabSwitcher";
-import DynamicForm from "@/components/DynamicForm";
-import DataTable from "@/components/DataTable";
+import TabSwitcher from "@/components/manage/TabSwitcher";
+import DynamicForm from "@/components/manage/DynamicForm";
+import DataTable from "@/components/manage/DataTable";
 
 const PRIMARY_KEYS = {
   projects: "project_id",

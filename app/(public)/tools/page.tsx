@@ -96,6 +96,14 @@ const toolsData = [
     status: "Fun Project",
     desc: "Aplikasi kamera interaktif berbasis AI yang mendeteksi gestur 2 jari (victory sign) secara real-time untuk memicu efek kekaburan lensa otomatis, terinspirasi dari tren viral 'Foto Kita Blur'.",
     link: "blur-snap"
+  },
+  {
+    id: 12,
+    name: "AI 4-Cut Photo Booth Studio",
+    category: "Utilitas",
+    status: "Fun Project",
+    desc: "Ambil 4 sesi foto estetik langsung dari kameramu. Simpan hasilnya di brankas digital berbasis nomor WhatsApp, unduh instan, atau bagikan langsung dalam bentuk strip fisik digital.",
+    link: "photo-booth"
   }
 ];
 
