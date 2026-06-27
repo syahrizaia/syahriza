@@ -88,6 +88,14 @@ const toolsData = [
     status: "Fun Project",
     desc: "Wadah anonim untuk meluapkan beban pikiran. Kalimat atau keluhan yang baru dimasukkan atau sering ditekankan akan membesar secara dinamis membentuk visualisasi awan emosi kolektif.",
     link: "vent"
+  },
+  {
+    id: 11,
+    name: "Blur Gesture Cam (Tren Foto Kita Blur)",
+    category: "Utilitas",
+    status: "Fun Project",
+    desc: "Aplikasi kamera interaktif berbasis AI yang mendeteksi gestur 2 jari (victory sign) secara real-time untuk memicu efek kekaburan lensa otomatis, terinspirasi dari tren viral 'Foto Kita Blur'.",
+    link: "blur-snap"
   }
 ];
 
