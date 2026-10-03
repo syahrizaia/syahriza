@@ -23,7 +23,7 @@ export default function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 120, damping: 20 }}
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4"
+      className="sticky top-0 z-50 flex justify-center p-4 backdrop-blur-xl bg-white/30 dark:bg-black/30 border-b border-gray-200/20 dark:border-white/10 shadow-sm"
     >
       {/* 🔮 CONTAINER UTAMA: LIQUID GLASS KAPSUL */}
       <div className="relative flex items-center justify-between w-full max-w-4xl px-6 py-3 rounded-full bg-gradient-to-b from-white/[0.07] via-white/[0.01] to-white/[0.04] backdrop-blur-2xl border border-white/[0.08] border-t-white/[0.18] border-l-white/[0.12] shadow-[inset_0_1px_2px_rgba(255,255,255,0.15),0_12px_40px_-12px_rgba(0,0,0,0.7)]">

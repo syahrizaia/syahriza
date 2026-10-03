@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import BgRemover from "@/components/tools/BgRemover";
 
 const toolsData = [
   {
@@ -215,6 +216,10 @@ export default function ToolsPage() {
             <p className="text-sm text-slate-500">Tidak ada alat kerja yang cocok dengan filter atau pencarian Anda.</p>
           </div>
         )}
+
+        <section className="mt-20" aria-labelledby="bg-remover-heading">
+          <BgRemover />
+        </section>
 
       </div>
     </div>
