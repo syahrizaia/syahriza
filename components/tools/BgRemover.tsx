@@ -3,6 +3,9 @@
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import { Download, ImageUp, LoaderCircle } from "lucide-react";
+import { removeSolidBackground } from "./removeSolidBackground";
+
+type RemovalMode = "auto" | "white";
 
 async function cleanTransparentEdges(blob: Blob): Promise<Blob> {
   const bitmap = await createImageBitmap(blob);
@@ -66,6 +69,7 @@ export default function BgRemover() {
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [mode, setMode] = useState<RemovalMode>("auto");
   const [error, setError] = useState("");
   const requestId = useRef(0);
 
@@ -79,7 +83,7 @@ export default function BgRemover() {
 
   useEffect(() => () => { requestId.current += 1; }, []);
 
-  async function processFile(nextFile: File) {
+  async function processFile(nextFile: File, selectedMode: RemovalMode = mode) {
     if (!nextFile.type.startsWith("image/")) {
       setError("Pilih file gambar yang valid.");
       return;
@@ -93,18 +97,24 @@ export default function BgRemover() {
     setIsProcessing(true);
 
     try {
-      const { removeBackground } = await import("@imgly/background-removal");
-      const result = await removeBackground(nextFile, {
-        model: "isnet",
-        output: { format: "image/png", quality: 1 },
-      });
-      const cleanResult = await cleanTransparentEdges(result);
+      let result = await removeSolidBackground(nextFile, selectedMode === "white" ? [255, 255, 255] : undefined);
+      if (!result && selectedMode === "white") {
+        throw new Error("Area putih tidak ditemukan. Pilih mode Otomatis untuk gambar ini.");
+      }
+      if (!result) {
+        const { removeBackground } = await import("@imgly/background-removal");
+        const aiResult = await removeBackground(nextFile, {
+          model: "isnet",
+          output: { format: "image/png", quality: 1 },
+        });
+        result = await cleanTransparentEdges(aiResult);
+      }
       if (currentRequest === requestId.current) {
-        setResultUrl(URL.createObjectURL(cleanResult));
+        setResultUrl(URL.createObjectURL(result));
       }
     } catch (error) {
       if (currentRequest === requestId.current) {
-        setError(error instanceof Error && (error.message.includes("Model tidak menemukan") || error.message.includes("Canvas tidak tersedia"))
+        setError(error instanceof Error && (error.message.includes("Model tidak menemukan") || error.message.includes("Canvas tidak tersedia") || error.message.includes("Area putih tidak ditemukan"))
           ? error.message
           : "Latar belakang gagal dihapus. Periksa koneksi internet saat pemuatan model pertama, lalu coba lagi.");
       }
@@ -138,7 +148,7 @@ export default function BgRemover() {
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-white">Penghapus Latar Belakang</h1>
-        <p className="mt-2 text-sm text-slate-400">Unggah gambar untuk menghapus latarnya. Hasil PNG transparan dapat diunduh pada resolusi asli gambar.</p>
+        <p className="mt-2 text-sm text-slate-400">Unggah gambar untuk menghapus latarnya. Untuk kumpulan logo dengan latar putih, pilih mode Latar putih. Hasil PNG transparan tetap beresolusi asli.</p>
       </div>
 
       <div
@@ -154,6 +164,24 @@ export default function BgRemover() {
         </label>
         <input id="bg-remover-upload" type="file" accept="image/*" onChange={handleChange} className="sr-only" />
       </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Mode penghapusan latar">
+        {([["auto", "Otomatis"], ["white", "Latar putih"]] as const).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={mode === value}
+            onClick={() => {
+              setMode(value);
+              if (file) void processFile(file, value);
+            }}
+            className={`rounded-full border px-4 py-2 text-sm transition-colors ${mode === value ? "border-cyan-400 bg-cyan-400/15 text-cyan-200" : "border-white/15 text-slate-400 hover:text-white"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {mode === "white" && <p className="mt-2 text-xs text-slate-400">Mode ini juga menghapus bagian logo yang berwarna putih sama seperti latarnya.</p>}
 
       {error && <p role="alert" className="mt-4 text-sm text-rose-400">{error}</p>}
       {isProcessing && (
