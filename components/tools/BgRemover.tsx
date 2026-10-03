@@ -4,6 +4,62 @@ import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import { Download, ImageUp, LoaderCircle } from "lucide-react";
 
+async function cleanTransparentEdges(blob: Blob): Promise<Blob> {
+  const bitmap = await createImageBitmap(blob);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) {
+    bitmap.close();
+    throw new Error("Canvas tidak tersedia di browser ini.");
+  }
+
+  context.drawImage(bitmap, 0, 0);
+  bitmap.close();
+  const image = context.getImageData(0, 0, canvas.width, canvas.height);
+  const { data } = image;
+  const { width, height } = canvas;
+  const alpha = new Uint8Array(width * height);
+  const horizontalMin = new Uint8Array(alpha.length);
+
+  for (let i = 0; i < alpha.length; i++) alpha[i] = data[i * 4 + 3];
+
+  // Shrink the mask by two pixels to remove background color left on the edge.
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minimum = 255;
+      for (let offset = -2; offset <= 2; offset++) {
+        minimum = Math.min(minimum, alpha[y * width + Math.max(0, Math.min(width - 1, x + offset))]);
+      }
+      horizontalMin[y * width + x] = minimum;
+    }
+  }
+
+  let transparentPixels = 0;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minimum = 255;
+      for (let offset = -2; offset <= 2; offset++) {
+        minimum = Math.min(minimum, horizontalMin[Math.max(0, Math.min(height - 1, y + offset)) * width + x]);
+      }
+      const refinedAlpha = Math.max(0, Math.min(255, Math.round((minimum - 30) * 255 / 190)));
+      data[(y * width + x) * 4 + 3] = refinedAlpha;
+      if (refinedAlpha === 0) transparentPixels++;
+    }
+  }
+
+  if (transparentPixels === 0) throw new Error("Model tidak menemukan area latar yang bisa dihapus pada gambar ini.");
+  context.putImageData(image, 0, 0);
+
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((result) => {
+      if (result) resolve(result);
+      else reject(new Error("PNG transparan gagal dibuat."));
+    }, "image/png");
+  });
+}
+
 export default function BgRemover() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -42,12 +98,15 @@ export default function BgRemover() {
         model: "isnet",
         output: { format: "image/png", quality: 1 },
       });
+      const cleanResult = await cleanTransparentEdges(result);
       if (currentRequest === requestId.current) {
-        setResultUrl(URL.createObjectURL(result));
+        setResultUrl(URL.createObjectURL(cleanResult));
       }
-    } catch {
+    } catch (error) {
       if (currentRequest === requestId.current) {
-        setError("Latar belakang gagal dihapus. Periksa koneksi internet saat pemuatan model pertama, lalu coba lagi.");
+        setError(error instanceof Error && (error.message.includes("Model tidak menemukan") || error.message.includes("Canvas tidak tersedia"))
+          ? error.message
+          : "Latar belakang gagal dihapus. Periksa koneksi internet saat pemuatan model pertama, lalu coba lagi.");
       }
     } finally {
       if (currentRequest === requestId.current) setIsProcessing(false);
@@ -109,7 +168,13 @@ export default function BgRemover() {
             {(["Sebelum", "Sesudah"] as const).map((label, index) => (
               <div key={label} className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70">
                 <p className="border-b border-white/10 px-4 py-3 text-sm font-medium text-slate-300">{label}</p>
-                <div className="relative aspect-square bg-slate-800">
+                <div
+                  className="relative aspect-square bg-slate-800"
+                  style={index === 1 ? {
+                    backgroundImage: "conic-gradient(#cbd5e1 25%, #ffffff 0 50%, #cbd5e1 0 75%, #ffffff 0)",
+                    backgroundSize: "24px 24px",
+                  } : undefined}
+                >
                   {(index === 0 || resultUrl) && <Image src={index === 0 ? previewUrl : resultUrl!} alt={index === 0 ? "Gambar asli" : "Gambar dengan latar belakang transparan"} fill unoptimized sizes="(max-width: 640px) 100vw, 50vw" className="object-contain" />}
                 </div>
               </div>
