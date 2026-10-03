@@ -4,24 +4,22 @@ import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import { Download, ImageUp, LoaderCircle } from "lucide-react";
 
-// UI placeholder until a background removal engine is connected.
-async function removeBackground(file: File): Promise<File> {
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-  return file;
-}
-
 export default function BgRemover() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState("");
   const requestId = useRef(0);
 
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
+
+  useEffect(() => () => {
+    if (resultUrl) URL.revokeObjectURL(resultUrl);
+  }, [resultUrl]);
 
   useEffect(() => () => { requestId.current += 1; }, []);
 
@@ -34,15 +32,23 @@ export default function BgRemover() {
     const currentRequest = ++requestId.current;
     setFile(nextFile);
     setPreviewUrl(URL.createObjectURL(nextFile));
-    setIsReady(false);
+    setResultUrl(null);
     setError("");
     setIsProcessing(true);
 
     try {
-      await removeBackground(nextFile);
-      if (currentRequest === requestId.current) setIsReady(true);
+      const { removeBackground } = await import("@imgly/background-removal");
+      const result = await removeBackground(nextFile, {
+        model: "isnet",
+        output: { format: "image/png", quality: 1 },
+      });
+      if (currentRequest === requestId.current) {
+        setResultUrl(URL.createObjectURL(result));
+      }
     } catch {
-      if (currentRequest === requestId.current) setError("Gambar gagal diproses. Coba lagi.");
+      if (currentRequest === requestId.current) {
+        setError("Latar belakang gagal dihapus. Periksa koneksi internet saat pemuatan model pertama, lalu coba lagi.");
+      }
     } finally {
       if (currentRequest === requestId.current) setIsProcessing(false);
     }
@@ -62,18 +68,18 @@ export default function BgRemover() {
   }
 
   function downloadResult() {
-    if (!file || !previewUrl || !isReady) return;
+    if (!file || !resultUrl) return;
     const link = document.createElement("a");
-    link.href = previewUrl;
-    link.download = file.name;
+    link.href = resultUrl;
+    link.download = `${file.name.replace(/\.[^.]+$/, "")}-tanpa-latar.png`;
     link.click();
   }
 
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-xl sm:p-8">
       <div className="mb-6">
-        <h2 id="bg-remover-heading" className="text-2xl font-bold text-white">Penghapus Latar Belakang</h2>
-        <p className="mt-2 text-sm text-slate-400">Unggah gambar untuk melihat alur pratinjau. Penghapusan latar belum tersedia; hasil sementara tetap gambar asli.</p>
+        <h1 className="text-3xl font-bold text-white">Penghapus Latar Belakang</h1>
+        <p className="mt-2 text-sm text-slate-400">Unggah gambar untuk menghapus latarnya. Hasil PNG transparan dapat diunduh pada resolusi asli gambar.</p>
       </div>
 
       <div
@@ -93,25 +99,25 @@ export default function BgRemover() {
       {error && <p role="alert" className="mt-4 text-sm text-rose-400">{error}</p>}
       {isProcessing && (
         <div role="status" className="mt-6 flex items-center justify-center gap-2 text-sm text-cyan-300">
-          <LoaderCircle className="animate-spin" size={20} aria-hidden="true" /> Memproses gambar...
+          <LoaderCircle className="animate-spin" size={20} aria-hidden="true" /> Menghapus latar belakang...
         </div>
       )}
 
       {previewUrl && (
         <div className="mt-8">
           <div className="grid gap-4 sm:grid-cols-2">
-            {(["Sebelum", "Sesudah (pratinjau)"] as const).map((label, index) => (
+            {(["Sebelum", "Sesudah"] as const).map((label, index) => (
               <div key={label} className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70">
                 <p className="border-b border-white/10 px-4 py-3 text-sm font-medium text-slate-300">{label}</p>
                 <div className="relative aspect-square bg-slate-800">
-                  {(index === 0 || isReady) && <Image src={previewUrl} alt={index === 0 ? "Gambar asli" : "Pratinjau hasil, masih sama dengan gambar asli"} fill unoptimized sizes="(max-width: 640px) 100vw, 50vw" className="object-contain" />}
+                  {(index === 0 || resultUrl) && <Image src={index === 0 ? previewUrl : resultUrl!} alt={index === 0 ? "Gambar asli" : "Gambar dengan latar belakang transparan"} fill unoptimized sizes="(max-width: 640px) 100vw, 50vw" className="object-contain" />}
                 </div>
               </div>
             ))}
           </div>
-          {isReady && (
+          {resultUrl && (
             <button type="button" onClick={downloadResult} className="mt-6 inline-flex items-center gap-2 rounded-full bg-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400">
-              <Download size={17} aria-hidden="true" /> Unduh Pratinjau
+              <Download size={17} aria-hidden="true" /> Unduh PNG Resolusi Asli
             </button>
           )}
         </div>

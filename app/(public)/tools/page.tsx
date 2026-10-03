@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import BgRemover from "@/components/tools/BgRemover";
 
 const toolsData = [
   {
@@ -105,6 +104,14 @@ const toolsData = [
     status: "Fun Project",
     desc: "Ambil 4 sesi foto estetik langsung dari kameramu. Simpan hasilnya di brankas digital berbasis nomor WhatsApp, unduh instan, atau bagikan langsung dalam bentuk strip fisik digital.",
     link: "photo-booth"
+  },
+  {
+    id: 13,
+    name: "Penghapus Latar Belakang Gambar",
+    category: "Utilitas",
+    status: "Fun Project",
+    desc: "Hapus latar belakang gambar langsung di browser dan unduh hasilnya sebagai PNG transparan dengan resolusi asli.",
+    link: "bg-remover"
   }
 ];
 
@@ -216,10 +223,6 @@ export default function ToolsPage() {
             <p className="text-sm text-slate-500">Tidak ada alat kerja yang cocok dengan filter atau pencarian Anda.</p>
           </div>
         )}
-
-        <section className="mt-20" aria-labelledby="bg-remover-heading">
-          <BgRemover />
-        </section>
 
       </div>
     </div>
